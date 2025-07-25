@@ -1,3 +1,9 @@
+const btns = document.querySelectorAll("button");
+const results = document.querySelector("#results");
+results.style.whiteSpace = "pre";
+results.style.marginTop = "30px";
+// CHOICE LOGIC ////////
+///////////////////////
 function getComputerChoice() {
   let rand = Math.random() * 3;
   let computerChoice;
@@ -18,42 +24,46 @@ function getHumanChoice() {
   return humanChoice;
 }
 
-function playGame() {
-  let humanScore = 0;
-  let computerScore = 0;
-
-  function playRound(humanChoice, computerChoice) {
-    let message;
-
-    if (humanChoice == computerChoice) {
-      message = "It's a tie";
-    } else if (
-      (humanChoice == "rock" && computerChoice == "scissors") ||
-      (humanChoice == "paper" && computerChoice == "rock") ||
-      (humanChoice == "scissors") & (computerChoice == "paper")
-    ) {
-      message = `It's a win. ${humanChoice} beats ${computerChoice}`;
-      humanScore++;
-    } else {
-      message = `It's a loss. ${humanChoice} loses to ${computerChoice}`;
-      computerScore++;
-    }
-
-    console.log(message);
-    console.log(
-      `Current score: Human ${humanScore} - ${computerScore} Computer`
-    );
-  }
-
-  for (let round = 0; round < 5; round++) {
-    playRound(getHumanChoice(), getComputerChoice());
-  }
-
-  if (humanScore > computerScore) {
-    console.log("Human won");
-  } else {
-    console.log("Computer won");
-  }
+// PLAY ////////
+///////////////////////
+for (const btn of btns) {
+  btn.choice = btn.textContent;
+  btn.addEventListener("click", playRound, false);
 }
 
-playGame();
+let humanScore = 0;
+let computerScore = 0;
+
+function playRound(e) {
+  results.textContent = "";
+  let message;
+  const computerChoice = getComputerChoice();
+  const humanChoice = e.currentTarget.choice;
+
+  if (humanChoice == computerChoice) {
+    message = "It's a tie";
+  } else if (
+    (humanChoice == "rock" && computerChoice == "scissors") ||
+    (humanChoice == "paper" && computerChoice == "rock") ||
+    (humanChoice == "scissors" && computerChoice == "paper")
+  ) {
+    message = `It's a win. ${humanChoice} beats ${computerChoice}`;
+    humanScore++;
+  } else {
+    message = `It's a loss. ${humanChoice} loses to ${computerChoice}`;
+    computerScore++;
+  }
+
+  message += `\n\nCurrent score: Human ${humanScore} - ${computerScore} Computer`;
+  if (computerScore == 5 || humanScore == 5) {
+    for (const btn of btns) {
+      btn.choice = btn.textContent;
+      btn.removeEventListener("click", playRound, false);
+    }
+
+    computerScore > humanScore
+      ? (message += "\nComputer wins the game.")
+      : (message += "\nPlayer wins the game.");
+  }
+  results.textContent += message;
+}
